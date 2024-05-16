@@ -9,7 +9,7 @@ fun main() {
             break
         }
 
-        val result = calculateCommission("Visa", previousMonthlyTransfers, transferAmount)
+        val result = calculateCommission("Mastercard", previousMonthlyTransfers, transferAmount)
         println("Перевод ${result.first}. Комиссия ${result.second}")
 
         previousMonthlyTransfers += transferAmount
@@ -35,8 +35,18 @@ fun calculateCommission(cardType: String = "Мир", previousMonthlyTransfers: I
 fun isTransferBlocked(transferAmount: Int, previousMonthlyTransfers: Int): Boolean =
     transferAmount > 150000 || previousMonthlyTransfers + transferAmount > 600000
 
-fun calculateMastercardCommission(previousMonthlyTransfers: Int, transferAmount: Int): Int =
-    if (previousMonthlyTransfers < 75000) 0 else (75000 * 0.006).toInt() + 20
+fun calculateMastercardCommission(previousMonthlyTransfers: Int, transferAmount: Int): Int {
+    val limit =  75000
+    val exceededAmount = (previousMonthlyTransfers + transferAmount) - limit
+    return  if (exceededAmount > 0) {
+        val commissionAmount = if (exceededAmount > transferAmount) transferAmount else exceededAmount
+        (commissionAmount * 0.006).toInt() + 20
+    } else {
+        0
+    }
+
+}
+
 
 fun calculateVisaCommission(transferAmount: Int): Int {
     val baseCommission = (transferAmount * 0.0075).toInt()
